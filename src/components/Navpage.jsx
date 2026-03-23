@@ -13,6 +13,7 @@ function Navpage() {
     const [role, setRole] = useState("")
     const [notifications, setNotifications] = useState([])
     const [showNotifications, setShowNotifications] = useState(false)
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
     useEffect(() => {
         fetchNotifications()
@@ -38,26 +39,45 @@ function Navpage() {
             setIsLoggedIn(false)
             setRole("")
         }
+        setIsMobileMenuOpen(false)
+        setShowNotifications(false)
     }, [location])
 
     const handleLogout = () => {
         sessionStorage.clear()
         setIsLoggedIn(false)
         setRole("")
+        setIsMobileMenuOpen(false)
         navigate('/login')
     }
 
     return (
         <>
-            <nav className="bg-white shadow-md px-8 py-4 flex justify-between items-center sticky top-0 z-50">
-                <Link to="/" className="text-2xl font-black text-blue-600 tracking-tighter">
-                    SHOP<span className="text-gray-900">ZY</span>
-                </Link>
+            <nav className="bg-white shadow-md px-4 md:px-8 py-4 flex flex-col md:flex-row md:justify-between md:items-center sticky top-0 z-50">
+                <div className="flex justify-between items-center w-full md:w-auto">
+                    <Link to="/" className="text-2xl font-black text-blue-600 tracking-tighter">
+                        SHOP<span className="text-gray-900">ZY</span>
+                    </Link>
+                    
+                    <button 
+                        className="md:hidden text-gray-700 hover:text-blue-600 focus:outline-none p-2"
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        aria-label="Toggle menu"
+                    >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            {isMobileMenuOpen ? (
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            ) : (
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                            )}
+                        </svg>
+                    </button>
+                </div>
 
-                <div className="flex gap-8 items-center font-medium">
+                <div className={`${isMobileMenuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row gap-4 md:gap-8 items-center font-medium w-full md:w-auto mt-4 md:mt-0 pb-4 md:pb-0 transition-all duration-300`}>
                     <Link 
                         to="/" 
-                        className={`transition-colors ${location.pathname === '/' ? 'text-blue-600 font-black' : 'text-gray-700 hover:text-blue-600'}`}
+                        className={`transition-colors w-full md:w-auto text-center ${location.pathname === '/' ? 'text-blue-600 font-black' : 'text-gray-700 hover:text-blue-600'}`}
                     >
                         Home
                     </Link>
@@ -65,7 +85,7 @@ function Navpage() {
                     {(role === "admin" || role === "manager" || role === "superadmin") && (
                         <Link 
                             to="/dashboard" 
-                            className={`transition-colors ${location.pathname === '/dashboard' ? 'text-blue-600 font-black' : 'text-gray-700 hover:text-blue-600'}`}
+                            className={`transition-colors w-full md:w-auto text-center ${location.pathname === '/dashboard' ? 'text-blue-600 font-black' : 'text-gray-700 hover:text-blue-600'}`}
                         >
                             Dashboard
                         </Link>
@@ -73,16 +93,16 @@ function Navpage() {
                     
                     <Link 
                         to="/productdetail" 
-                        className={`transition-colors ${location.pathname === '/productdetail' ? 'text-blue-600 font-black' : 'text-gray-700 hover:text-blue-600'}`}
+                        className={`transition-colors w-full md:w-auto text-center ${location.pathname === '/productdetail' ? 'text-blue-600 font-black' : 'text-gray-700 hover:text-blue-600'}`}
                     >
                         Shop
                     </Link>
 
                     <Link 
                         to={'/wishlist'} 
-                        className={`transition-colors relative flex items-center gap-2 ${location.pathname === '/wishlist' ? 'text-blue-600 font-black' : 'text-gray-400 hover:text-blue-600'}`}
+                        className={`transition-colors w-full md:w-auto flex items-center justify-center gap-2 ${location.pathname === '/wishlist' ? 'text-blue-600 font-black' : 'text-gray-400 hover:text-blue-600'}`}
                     >
-                        Wishlist
+                        <span>Wishlist</span>
                         {wishlist.length > 0 && (
                             <span className="bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
                                 {wishlist.length}
@@ -91,7 +111,7 @@ function Navpage() {
                     </Link>
 
                     {/* Notification Bell */}
-                    <div className="relative">
+                    <div className="relative flex justify-center w-full md:w-auto">
                         <button 
                             onClick={() => setShowNotifications(!showNotifications)}
                             className="text-gray-700 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100 transition-all relative"
@@ -108,14 +128,14 @@ function Navpage() {
                         </button>
 
                         {showNotifications && (
-                            <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-[60] py-2 max-h-[400px] overflow-y-auto">
+                            <div className="absolute left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:right-0 mt-12 md:mt-2 w-[calc(100vw-2rem)] sm:w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-[60] py-2 max-h-[400px] overflow-y-auto">
                                 <div className="px-4 py-2 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
                                     <h3 className="font-bold text-gray-900 text-sm">Notifications</h3>
                                     <span className="text-[10px] bg-blue-100 text-blue-700 font-bold px-2 py-0.5 rounded-full">New</span>
                                 </div>
                                 {notifications.length > 0 ? (
                                     notifications.map((n) => (
-                                        <div key={n.id} className="px-4 py-3 hover:bg-blue-50/50 transition-colors border-b border-gray-50 last:border-0 cursor-default">
+                                        <div key={n.id} className="px-4 py-3 hover:bg-blue-50/50 transition-colors border-b border-gray-50 last:border-0 cursor-default text-left">
                                             <p className="font-bold text-gray-900 text-xs mb-1">{n.title}</p>
                                             <p className="text-gray-600 text-xs leading-relaxed">{n.message}</p>
                                             <p className="text-[9px] text-gray-400 mt-2 flex items-center gap-1">
@@ -137,18 +157,18 @@ function Navpage() {
 
                     <Link 
                         to={'/myorders'} 
-                        className={`transition-colors font-bold ${location.pathname === '/myorders' ? 'text-blue-600 font-black' : 'text-gray-400 hover:text-blue-600'}`}
+                        className={`transition-colors font-bold w-full md:w-auto text-center ${location.pathname === '/myorders' ? 'text-blue-600 font-black' : 'text-gray-400 hover:text-blue-600'}`}
                     >
                         My Orders
                     </Link>
 
                     <Link 
                         to="/cart" 
-                        className={`relative group transition-colors ${location.pathname === '/cart' ? 'text-blue-600 font-black' : 'text-gray-700 hover:text-blue-600'}`}
+                        className={`relative group transition-colors w-full md:w-auto flex items-center justify-center ${location.pathname === '/cart' ? 'text-blue-600 font-black' : 'text-gray-700 hover:text-blue-600'}`}
                     >
                         <span>Cart</span>
                         {getCartCount() > 0 && (
-                            <span className="absolute -top-2 -right-4 bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white shadow-sm animate-bounce">
+                            <span className="absolute -top-2 md:-top-2 right-[50%] md:-right-4 translate-x-[25px] md:translate-x-0 bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white shadow-sm animate-bounce">
                                 {getCartCount()}
                             </span>
                         )}
@@ -158,14 +178,14 @@ function Navpage() {
                     {isLoggedIn ? (
                         <button
                             onClick={handleLogout}
-                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
+                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors w-full md:w-auto text-center"
                         >
                             Logout
                         </button>
                     ) : (
                         <Link
                             to="/login"
-                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors w-full md:w-auto text-center"
                         >
                             Login
                         </Link>
