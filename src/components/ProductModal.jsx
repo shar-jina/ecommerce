@@ -9,8 +9,8 @@ const ProductModal = ({ isOpen, onClose, product, onUpdate }) => {
         category: '',
         stock: '',
     });
-    const [image, setImage] = useState(null);
-    const [preview, setPreview] = useState('');
+    const [images, setImages] = useState([]);
+    const [previews, setPreviews] = useState([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -22,7 +22,13 @@ const ProductModal = ({ isOpen, onClose, product, onUpdate }) => {
                 category: product.category || '',
                 stock: product.stock || '',
             });
-            setPreview(product.image || '');
+            if (product.images && product.images.length > 0) {
+                setPreviews(product.images);
+            } else if (product.image) {
+                setPreviews([product.image]);
+            } else {
+                setPreviews([]);
+            }
         } else {
             setFormData({
                 name: '',
@@ -31,16 +37,17 @@ const ProductModal = ({ isOpen, onClose, product, onUpdate }) => {
                 category: '',
                 stock: '',
             });
-            setPreview('');
-            setImage(null);
+            setPreviews([]);
+            setImages([]);
         }
     }, [product, isOpen]);
 
     const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setImage(file);
-            setPreview(URL.createObjectURL(file));
+        const files = Array.from(e.target.files);
+        if (files.length > 0) {
+            setImages(files);
+            const filePreviews = files.map(file => URL.createObjectURL(file));
+            setPreviews(filePreviews);
         }
     };
 
@@ -50,7 +57,7 @@ const ProductModal = ({ isOpen, onClose, product, onUpdate }) => {
 
         const token = sessionStorage.getItem('token');
         const reqHeader = {
-            "Content-Type": image ? "multipart/form-data" : "application/json",
+            "Content-Type": images.length > 0 ? "multipart/form-data" : "application/json",
             "Authorization": `Bearer ${token}`
         };
 
@@ -58,22 +65,18 @@ const ProductModal = ({ isOpen, onClose, product, onUpdate }) => {
             let result;
             if (product) {
                 // Update Product
-                const updateData = image ? new FormData() : { ...formData };
-                if (image) {
+                const updateData = images.length > 0 ? new FormData() : { ...formData };
+                if (images.length > 0) {
                     Object.keys(formData).forEach(key => updateData.append(key, formData[key]));
-                    updateData.append('image', image);
+                    images.forEach(img => updateData.append('images', img));
                 }
 
-                // Note: If backend expects JSON for update without image, we pass JSON.
-                // If backend expects multipart for update with image, we pass FormData.
-                // Based on standard implementation, we'll try to keep it consistent.
-
-                result = await updateProductAPI(product.id, image ? updateData : formData, reqHeader);
+                result = await updateProductAPI(product.id, images.length > 0 ? updateData : formData, reqHeader);
             } else {
                 // Add Product
                 const addData = new FormData();
                 Object.keys(formData).forEach(key => addData.append(key, formData[key]));
-                addData.append('image', image);
+                images.forEach(img => addData.append('images', img));
                 result = await addProductAPI(addData, reqHeader);
             }
 
@@ -173,24 +176,32 @@ const ProductModal = ({ isOpen, onClose, product, onUpdate }) => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
-                            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-blue-400 transition-colors cursor-pointer relative">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Product Images</label>
+                            <div className="mt-1 flex flex-col items-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-blue-400 transition-colors cursor-pointer relative">
                                 <input
                                     type="file"
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    multiple
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                     onChange={handleImageChange}
                                     accept="image/*"
                                 />
-                                <div className="space-y-1 text-center">
-                                    {preview ? (
-                                        <img src={preview} alt="Preview" className="mx-auto h-32 w-32 object-cover rounded-lg" />
+                                <div className="space-y-1 text-center w-full">
+                                    {previews.length > 0 ? (
+                                        <div className="grid grid-cols-4 gap-2 mt-2 relative z-0">
+                                            {previews.map((preview, idx) => (
+                                                <img key={idx} src={preview} alt={`Preview ${idx}`} className="h-20 w-full object-cover rounded-lg shadow-sm border border-gray-100" />
+                                            ))}
+                                            <div className="flex items-center justify-center h-20 w-full bg-gray-50 rounded-lg border border-dashed border-gray-300 text-gray-400 text-xs text-center p-1">
+                                                Click to replace all
+                                            </div>
+                                        </div>
                                     ) : (
                                         <>
                                             <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                                 <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                             </svg>
-                                            <div className="flex text-sm text-gray-600">
-                                                <span>Upload a file</span>
+                                            <div className="flex text-sm text-gray-600 justify-center">
+                                                <span className="font-medium text-blue-600">Upload multiple files</span>
                                             </div>
                                             <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
                                         </>
