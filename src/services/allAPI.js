@@ -79,3 +79,16 @@ export const getNotificationsAPI = async () => {
 export const deleteNotificationAPI = async (id, header) => {
     return await commonAPI("DELETE", `${SERVER_URL}/api/notifications/${id}`, {}, header);
 }
+
+// Users API
+export const getAllUsersAPI = async (header) => {
+    return await commonAPI("GET", `${SERVER_URL}/api/users`, "", header);
+}
+
+export const toggleBlockUserAPI = async (id, status, header) => {
+    return await commonAPI("PUT", `${SERVER_URL}/api/users/${id}/block`, { is_blocked: status }, header);
+}
+
+export const deleteUserAPI = async (id, header) => {
+    return await commonAPI("DELETE", `${SERVER_URL}/api/users/${id}`, {}, header);
+}

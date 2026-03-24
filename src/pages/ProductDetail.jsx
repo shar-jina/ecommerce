@@ -10,6 +10,7 @@ function ProductDetail() {
     const [loading, setLoading] = useState(true);
     const { addToCart } = useCart();
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const isWishlisted = product ? isInWishlist(product.id) : false;
 
@@ -51,6 +52,22 @@ function ProductDetail() {
         );
     }
 
+    const images = product.images && product.images.length > 0
+        ? product.images
+        : (product.image ? [product.image] : ['https://via.placeholder.com/800x800?text=No+Image']);
+
+    const nextImage = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    };
+
+    const prevImage = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    };
+
     return (
         <div className="bg-gray-50 min-h-screen py-12">
             <div className="max-w-7xl mx-auto px-6">
@@ -64,13 +81,52 @@ function ProductDetail() {
                 <div className="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
                     <div className="grid grid-cols-1 lg:grid-cols-2">
                         {/* Image Section */}
-                        <div className="bg-gray-50 flex items-center justify-center p-12">
-                            <div className="relative group w-full aspect-square overflow-hidden rounded-3xl bg-white shadow-inner">
+                        <div className="bg-gray-50 flex items-center justify-center p-12 relative group h-[100%]">
+                            <div className="relative w-full aspect-square overflow-hidden rounded-3xl bg-white shadow-inner">
                                 <img 
-                                    src={product.image} 
-                                    alt={product.name} 
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                                    src={images[currentImageIndex]} 
+                                    alt={`${product.name} - view ${currentImageIndex + 1}`} 
+                                    className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" 
                                 />
+                                
+                                {images.length > 1 && (
+                                    <>
+                                        {/* Carousel Navigation */}
+                                        <button 
+                                            onClick={prevImage}
+                                            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-md p-3 rounded-full text-gray-800 opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110 hover:bg-white shadow-lg z-10 border border-gray-100"
+                                        >
+                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                        </button>
+                                        <button 
+                                            onClick={nextImage}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-md p-3 rounded-full text-gray-800 opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110 hover:bg-white shadow-lg z-10 border border-gray-100"
+                                        >
+                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </button>
+
+                                        {/* Dots indicators */}
+                                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                                            {images.map((_, idx) => (
+                                                <button 
+                                                    key={idx} 
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        setCurrentImageIndex(idx);
+                                                    }}
+                                                    className={`h-2 rounded-full transition-all ${idx === currentImageIndex ? 'w-8 bg-blue-600 shadow-md' : 'w-2 bg-gray-300/80 backdrop-blur-sm shadow-sm hover:w-4 hover:bg-gray-400'}`}
+                                                    aria-label={`Go to slide ${idx + 1}`}
+                                                />
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
+
                                 <div className="absolute top-6 right-6">
                                     <span className="px-4 py-2 bg-white/90 backdrop-blur-md text-blue-600 text-xs font-black rounded-full shadow-sm uppercase tracking-widest border border-blue-50/50">
                                         {product.category}

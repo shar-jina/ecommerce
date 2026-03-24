@@ -45,10 +45,18 @@ const ProductModal = ({ isOpen, onClose, product, onUpdate }) => {
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
         if (files.length > 0) {
-            setImages(files);
+            setImages(prev => {
+                const newImages = [...prev, ...files].slice(0, 5);
+                return newImages;
+            });
             const filePreviews = files.map(file => URL.createObjectURL(file));
-            setPreviews(filePreviews);
+            setPreviews(prev => {
+                const newPreviews = [...prev, ...filePreviews].slice(0, 5);
+                return newPreviews;
+            });
         }
+        // Reset the input value so the same file could be selected again if cleared
+        e.target.value = null;
     };
 
     const handleSubmit = async (e) => {
@@ -187,13 +195,30 @@ const ProductModal = ({ isOpen, onClose, product, onUpdate }) => {
                                 />
                                 <div className="space-y-1 text-center w-full">
                                     {previews.length > 0 ? (
-                                        <div className="grid grid-cols-4 gap-2 mt-2 relative z-0">
-                                            {previews.map((preview, idx) => (
-                                                <img key={idx} src={preview} alt={`Preview ${idx}`} className="h-20 w-full object-cover rounded-lg shadow-sm border border-gray-100" />
-                                            ))}
-                                            <div className="flex items-center justify-center h-20 w-full bg-gray-50 rounded-lg border border-dashed border-gray-300 text-gray-400 text-xs text-center p-1">
-                                                Click to replace all
+                                        <div className="mt-2 relative z-0">
+                                            <div className="grid grid-cols-4 gap-2">
+                                                {previews.map((preview, idx) => (
+                                                    <img key={idx} src={preview} alt={`Preview ${idx}`} className="h-20 w-full object-cover rounded-lg shadow-sm border border-gray-100" />
+                                                ))}
+                                                {previews.length < 5 && (
+                                                    <div className="flex flex-col items-center justify-center h-20 w-full bg-blue-50 hover:bg-blue-100 transition-colors cursor-pointer rounded-lg border border-dashed border-blue-300 text-blue-500 text-xs text-center p-1 relative z-10 pointer-events-none">
+                                                        <svg className="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"/></svg>
+                                                        Add More
+                                                    </div>
+                                                )}
                                             </div>
+                                            <button 
+                                                type="button" 
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    setImages([]);
+                                                    setPreviews([]);
+                                                }}
+                                                className="mt-3 text-red-500 text-sm font-medium hover:text-red-700 relative z-20 transition-colors"
+                                            >
+                                                Clear All Images
+                                            </button>
                                         </div>
                                     ) : (
                                         <>

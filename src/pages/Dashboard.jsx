@@ -5,6 +5,7 @@ import DashboardSidebar from '../components/DashboardSidebar';
 import PostManagement from '../components/PostManagement';
 import OrderManagement from '../components/OrderManagement';
 import NotificationManagement from '../components/NotificationManagement';
+import UserManagement from '../components/UserManagement';
 
 function Dashboard() {
   const [products, setProducts] = useState([]);
@@ -195,6 +196,8 @@ function Dashboard() {
               </div>
             </div>
           </div>
+        ) : activeSection === 'users' ? (
+          <UserManagement />
         ) : activeSection === 'orders' ? (
           <OrderManagement />
         ) : activeSection === 'notifications' ? (
