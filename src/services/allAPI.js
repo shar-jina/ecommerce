@@ -92,3 +92,12 @@ export const toggleBlockUserAPI = async (id, status, header) => {
 export const deleteUserAPI = async (id, header) => {
     return await commonAPI("DELETE", `${SERVER_URL}/api/users/${id}`, {}, header);
 }
+
+// Settings API
+export const getPaymentSettingsAPI = async () => {
+    return await commonAPI("GET", `${SERVER_URL}/api/settings/payment`, "", "");
+}
+
+export const updatePaymentSettingsAPI = async (settings, header) => {
+    return await commonAPI("PUT", `${SERVER_URL}/api/settings/payment`, settings, header);
+}

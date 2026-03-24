@@ -6,6 +6,7 @@ import PostManagement from '../components/PostManagement';
 import OrderManagement from '../components/OrderManagement';
 import NotificationManagement from '../components/NotificationManagement';
 import UserManagement from '../components/UserManagement';
+import PaymentSettings from '../components/PaymentSettings';
 
 function Dashboard() {
   const [products, setProducts] = useState([]);
@@ -202,6 +203,8 @@ function Dashboard() {
           <OrderManagement />
         ) : activeSection === 'notifications' ? (
           <NotificationManagement />
+        ) : activeSection === 'settings' ? (
+          <PaymentSettings />
         ) : (
           <PostManagement />
         )}

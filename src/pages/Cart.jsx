@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCart } from '../contexts/CartContext';
 import { Link, useNavigate } from 'react-router-dom';
-import { placeOrderAPI } from '../services/allAPI';
+import { placeOrderAPI, getPaymentSettingsAPI } from '../services/allAPI';
 
 function Cart() {
     const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
@@ -13,8 +13,31 @@ function Cart() {
         address: "",
         phone: ""
     });
+    
+    // Payment States
+    const [paymentSettings, setPaymentSettings] = useState(null);
+    const [selectedPayment, setSelectedPayment] = useState('');
+    const [fetchingSettings, setFetchingSettings] = useState(false);
 
-    const handleCheckout = async (e) => {
+    const initiateCheckout = async () => {
+        setFetchingSettings(true);
+        try {
+            const result = await getPaymentSettingsAPI();
+            if (result.status === 200) {
+                setPaymentSettings(result.data);
+                // default select an option if available
+                if (result.data.cod_enabled) setSelectedPayment('cod');
+                else if (result.data.online_enabled) setSelectedPayment('online');
+            }
+        } catch (error) {
+            console.error("Failed to load payment config", error);
+        } finally {
+            setFetchingSettings(false);
+            setShowCheckout(true);
+        }
+    };
+
+    const handleCheckoutSubmit = async (e) => {
         e.preventDefault();
         
         const token = sessionStorage.getItem("token");
@@ -38,7 +61,8 @@ function Cart() {
             items: cart,
             total_amount: getCartTotal(),
             shipping_address: shippingInfo.address,
-            contact_number: shippingInfo.phone
+            contact_number: shippingInfo.phone,
+            payment_method: selectedPayment
         };
 
         try {
@@ -156,16 +180,17 @@ function Cart() {
                                         </div>
                                     </div>
                                     <button 
-                                        onClick={() => setShowCheckout(true)}
-                                        className="w-full bg-blue-600 py-5 rounded-2xl font-black text-xl hover:bg-blue-500 transition-all active:scale-95 shadow-xl shadow-blue-900/40"
+                                        onClick={initiateCheckout}
+                                        disabled={fetchingSettings}
+                                        className="w-full bg-blue-600 py-5 rounded-2xl font-black text-xl hover:bg-blue-500 transition-all active:scale-95 shadow-xl shadow-blue-900/40 disabled:opacity-50"
                                     >
-                                        Checkout
+                                        {fetchingSettings ? 'Loading...' : 'Checkout'}
                                     </button>
                                 </>
                             ) : (
-                                <form onSubmit={handleCheckout} className="space-y-6">
+                                <form onSubmit={handleCheckoutSubmit} className="space-y-6">
                                     <div className="flex justify-between items-center mb-4">
-                                        <h3 className="text-lg font-bold text-blue-400">Shipping Details</h3>
+                                        <h3 className="text-lg font-bold text-blue-400">Checkout</h3>
                                         <button type="button" onClick={() => setShowCheckout(false)} className="text-xs text-gray-400 hover:text-white">Cancel</button>
                                     </div>
                                     <div className="space-y-4">
@@ -192,6 +217,41 @@ function Cart() {
                                             />
                                         </div>
                                     </div>
+
+                                    {/* Payment Methods */}
+                                    {paymentSettings && (
+                                        <div className="space-y-4 mt-6">
+                                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block">Payment Method</label>
+                                            <div className="flex flex-col gap-3">
+                                                {paymentSettings.cod_enabled && (
+                                                    <label className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-colors ${selectedPayment === 'cod' ? 'border-green-400 bg-green-400/10' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>
+                                                        <input type="radio" name="payment" value="cod" checked={selectedPayment === 'cod'} onChange={(e) => setSelectedPayment(e.target.value)} className="w-5 h-5 text-green-500 bg-gray-900 border-gray-600 focus:ring-green-500" />
+                                                        <span className="font-bold text-white">Cash on Delivery</span>
+                                                    </label>
+                                                )}
+                                                {paymentSettings.online_enabled && (
+                                                    <label className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-colors ${selectedPayment === 'online' ? 'border-blue-400 bg-blue-400/10' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>
+                                                        <input type="radio" name="payment" value="online" checked={selectedPayment === 'online'} onChange={(e) => setSelectedPayment(e.target.value)} className="w-5 h-5 text-blue-500 bg-gray-900 border-gray-600 focus:ring-blue-500" />
+                                                        <span className="font-bold text-white">Online Payment</span>
+                                                    </label>
+                                                )}
+                                                {!paymentSettings.cod_enabled && !paymentSettings.online_enabled && (
+                                                    <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-200 text-sm rounded-xl">
+                                                        No payment methods are currently available. Please contact support.
+                                                    </div>
+                                                )}
+                                            </div>
+                                            
+                                            {/* Store Instructions */}
+                                            {paymentSettings.instructions && (
+                                                <div className="mt-4 p-4 bg-blue-900/30 border border-blue-500/30 rounded-xl">
+                                                    <h4 className="text-xs font-bold text-blue-300 uppercase tracking-wider mb-2">Store Instructions</h4>
+                                                    <p className="text-sm text-blue-100 whitespace-pre-wrap leading-relaxed">{paymentSettings.instructions}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
                                     <div className="h-px bg-white/10 my-4"></div>
                                     <div className="flex justify-between items-end mb-6">
                                         <span className="text-lg font-bold">Total</span>
@@ -199,7 +259,8 @@ function Cart() {
                                     </div>
                                     <button 
                                         type="submit"
-                                        className="w-full bg-green-500 py-5 rounded-2xl font-black text-xl hover:bg-green-400 transition-all active:scale-95 shadow-xl shadow-green-900/40"
+                                        disabled={!selectedPayment}
+                                        className="w-full bg-green-500 py-5 rounded-2xl font-black text-xl hover:bg-green-400 transition-all active:scale-95 shadow-xl shadow-green-900/40 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         Place Order
                                     </button>
