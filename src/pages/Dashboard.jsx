@@ -42,12 +42,16 @@ function Dashboard() {
       };
       try {
         const result = await deleteProductAPI(id, reqHeader);
-        if (result.status === 200) {
+        if (result.status === 200 || result.status === 204) {
           alert("Product deleted successfully");
           fetchProducts();
+        } else {
+          const errorMsg = result.response?.data?.message || result.message || "Delete failed";
+          alert("Error: " + errorMsg);
         }
       } catch (error) {
         console.error("Delete failed", error);
+        alert("Critical error during deletion");
       }
     }
   };
@@ -138,7 +142,7 @@ function Dashboard() {
                       </tr>
                     ) : filteredProducts.length > 0 ? (
                       filteredProducts.map((product) => (
-                        <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+                        <tr key={product.id || product._id} className="hover:bg-gray-50 transition-colors">
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
                               <img
@@ -154,7 +158,7 @@ function Dashboard() {
                               {product.category}
                             </span>
                           </td>
-                          <td className="px-6 py-4 font-semibold text-gray-900">${product.price}</td>
+                          <td className="px-6 py-4 font-semibold text-gray-900">₹{product.price}</td>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
                               <div className={`w-2 h-2 rounded-full ${product.stock > 10 ? 'bg-green-500' : 'bg-red-500'}`}></div>
@@ -173,7 +177,7 @@ function Dashboard() {
                                 </svg>
                               </button>
                               <button
-                                onClick={() => handleDelete(product.id)}
+                                onClick={() => handleDelete(product.id || product._id)}
                                 className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"
                                 title="Delete Product"
                               >

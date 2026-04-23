@@ -1,19 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { getProductsAPI, getPostsAPI } from '../services/allAPI';
+import { getProductsAPI } from '../services/allAPI';
 import ProductCard from '../components/ProductCard';
-import PostCard from '../components/PostCard';
 
 function Prdctdetail() {
   const location = useLocation();
   const [products, setProducts] = useState([]);
-  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   
   // Search and Filter States
   const [searchQuery, setSearchQuery] = useState(location.state?.query || "");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState(location.state?.category || "All");
   const [sortBy, setSortBy] = useState("featured");
+
+  // Sync state with navigation state (in case user clicks a different banner while on this page)
+  useEffect(() => {
+    if (location.state?.category) {
+      setSelectedCategory(location.state.category);
+    }
+    if (location.state?.query) {
+      setSearchQuery(location.state.query);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,11 +29,6 @@ function Prdctdetail() {
         const productResult = await getProductsAPI();
         if (productResult.status === 200) {
           setProducts(productResult.data);
-        }
-
-        const postResult = await getPostsAPI();
-        if (postResult.status === 200) {
-          setPosts(postResult.data);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -132,24 +135,6 @@ function Prdctdetail() {
           </div>
         )}
       </main>
-
-      {/* Related Resources Section */}
-      {posts.length > 0 && !searchQuery && selectedCategory === "All" && (
-        <section className="bg-gray-50 py-20 border-t border-gray-100">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="mb-12">
-              <h2 className="text-3xl font-black text-gray-900 mb-2">Service Updates & Guides</h2>
-              <p className="text-gray-500">Everything you need to know about our services and tech maintenance</p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {posts.map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
     </div>
   )
 }

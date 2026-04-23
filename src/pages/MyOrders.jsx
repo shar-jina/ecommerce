@@ -83,7 +83,7 @@ function MyOrders() {
                                     </div>
                                     <div>
                                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total</p>
-                                        <p className="text-2xl font-black text-blue-600">${order.total_amount}</p>
+                                        <p className="text-2xl font-black text-blue-600">₹{order.total_amount}</p>
                                     </div>
                                 </div>
                                 <div className="p-8">
@@ -95,10 +95,10 @@ function MyOrders() {
                                                 </div>
                                                 <div className="flex-grow">
                                                     <h4 className="font-bold text-gray-900">{item.product_name}</h4>
-                                                    <p className="text-sm text-gray-500">Qty: {item.quantity} × ${item.price}</p>
+                                                    <p className="text-sm text-gray-500">Qty: {item.quantity} × ₹{item.price}</p>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="font-black text-gray-900">${(item.quantity * item.price).toFixed(2)}</p>
+                                                    <p className="font-black text-gray-900">₹{(item.quantity * item.price).toFixed(2)}</p>
                                                 </div>
                                             </div>
                                         ))}

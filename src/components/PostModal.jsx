@@ -7,7 +7,8 @@ const PostModal = ({ isOpen, onClose, post, onUpdate }) => {
         content: '',
         category: 'Offer',
         product_id: '',
-        discount_label: ''
+        discount_label: '',
+        target_category: ''
     });
     const [products, setProducts] = useState([]);
     const [image, setImage] = useState(null);
@@ -42,7 +43,8 @@ const PostModal = ({ isOpen, onClose, post, onUpdate }) => {
                 content: post.content || '',
                 category: post.category || 'Offer',
                 product_id: post.product_id || '',
-                discount_label: post.discount_label || ''
+                discount_label: post.discount_label || '',
+                target_category: post.target_category || ''
             });
             setPreview(post.image || '');
         } else {
@@ -51,7 +53,8 @@ const PostModal = ({ isOpen, onClose, post, onUpdate }) => {
                 content: '',
                 category: 'Offer',
                 product_id: '',
-                discount_label: ''
+                discount_label: '',
+                target_category: ''
             });
             setPreview('');
             setImage(null);
@@ -78,20 +81,31 @@ const PostModal = ({ isOpen, onClose, post, onUpdate }) => {
 
         try {
             let result;
+            // Use the formData as is, since onChange already handles the logic
+            const body = { ...formData };
+            
+            // Clean up empty strings to ensure the database handles them as NULL if needed
+            Object.keys(body).forEach(key => {
+                if (body[key] === '') body[key] = null;
+            });
+
             if (post) {
-                // Update Post
+                const targetId = post.id || post._id;
                 if (image) {
                     const updateData = new FormData();
-                    Object.keys(formData).forEach(key => updateData.append(key, formData[key]));
+                    Object.keys(body).forEach(key => {
+                        if (body[key] !== null) updateData.append(key, body[key]);
+                    });
                     updateData.append('image', image);
-                    result = await updatePostAPI(post.id, updateData, reqHeader);
+                    result = await updatePostAPI(targetId, updateData, reqHeader);
                 } else {
-                    result = await updatePostAPI(post.id, formData, reqHeader);
+                    result = await updatePostAPI(targetId, body, reqHeader);
                 }
             } else {
-                // Add Post
                 const addData = new FormData();
-                Object.keys(formData).forEach(key => addData.append(key, formData[key]));
+                Object.keys(body).forEach(key => {
+                    if (body[key] !== null) addData.append(key, body[key]);
+                });
                 if (image) addData.append('image', image);
                 result = await addPostAPI(addData, reqHeader);
             }
@@ -146,46 +160,75 @@ const PostModal = ({ isOpen, onClose, post, onUpdate }) => {
                             </div>
 
                             <div>
-                                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Category</label>
+                                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Post Label (Tag)</label>
                                 <select
                                     className="w-full px-5 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-bold text-gray-900"
                                     value={formData.category}
                                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                                 >
-                                    <option value="Offer">Offer</option>
-                                    <option value="Update">Update</option>
+                                    <option value="Offer">Special Offer</option>
+                                    <option value="Update">News & Update</option>
                                     <option value="Announcement">Announcement</option>
+                                    <option value="Collection">New Collection</option>
                                 </select>
                             </div>
 
-                            {formData.category === 'Offer' && (
-                                <div>
-                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Discount Label</label>
-                                    <input
-                                        type="text"
-                                        className="w-full px-5 py-3 bg-blue-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-black text-blue-600 placeholder:text-blue-200"
-                                        value={formData.discount_label}
-                                        onChange={(e) => setFormData({ ...formData, discount_label: e.target.value })}
-                                        placeholder="e.g. 50% OFF"
-                                    />
-                                </div>
-                            )}
+                            <div className="md:col-span-2">
+                                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Link Destination (Category)</label>
+                                <select
+                                    className="w-full px-5 py-3 bg-blue-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-black text-blue-600"
+                                    value={formData.target_category === 'All' ? 'all' : (formData.target_category ? `cat:${formData.target_category}` : (formData.product_id ? `prod:${formData.product_id}` : ''))}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        if (val.startsWith('cat:')) {
+                                            const catName = val.replace('cat:', '');
+                                            setFormData({ ...formData, target_category: catName, product_id: '' });
+                                        } else if (val.startsWith('prod:')) {
+                                            const prodId = val.replace('prod:', '');
+                                            setFormData({ ...formData, product_id: prodId, target_category: '' });
+                                        } else if (val === 'all') {
+                                            setFormData({ ...formData, target_category: 'All', product_id: '' });
+                                        } else {
+                                            setFormData({ ...formData, target_category: '', product_id: '' });
+                                        }
+                                    }}
+                                >
+                                    <option value="">No link (Static Banner)</option>
+                                    <option value="all">All Products</option>
+                                    
+                                    {/* Categories Section */}
+                                    <optgroup label="Browse by Category">
+                                        {[...new Set([...products.map(p => p.category), formData.target_category])]
+                                            .filter(Boolean)
+                                            .filter(cat => cat !== 'All')
+                                            .map(cat => (
+                                                <option key={cat} value={`cat:${cat}`}>{cat} Selection</option>
+                                            ))
+                                        }
+                                    </optgroup>
 
-                            {formData.category === 'Offer' && (
-                                <div className="md:col-span-2">
-                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Link to Product</label>
-                                    <select
-                                        className="w-full px-5 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-bold text-gray-900"
-                                        value={formData.product_id}
-                                        onChange={(e) => setFormData({ ...formData, product_id: e.target.value })}
-                                    >
-                                        <option value="">No specific product (General Offer)</option>
+                                    {/* Products Section */}
+                                    <optgroup label="Link to Specific Product">
                                         {products.map(p => (
-                                            <option key={p.id} value={p.id}>{p.name} - ${p.price}</option>
+                                            <option key={p.id} value={`prod:${p.id}`}>{p.name} (₹{p.price})</option>
                                         ))}
-                                    </select>
-                                </div>
-                            )}
+                                    </optgroup>
+                                </select>
+                                <p className="text-[9px] text-gray-400 mt-2 font-bold px-1 uppercase tracking-tighter">Clicking this poster will take users to the selected category.</p>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Discount Label / Deal</label>
+                                <input
+                                    type="text"
+                                    className="w-full px-5 py-3 bg-blue-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-black text-blue-600 placeholder:text-blue-200"
+                                    value={formData.discount_label}
+                                    onChange={(e) => setFormData({ ...formData, discount_label: e.target.value })}
+                                    placeholder="e.g. 50% OFF or EXCLUSIVE"
+                                />
+                            </div>
+
+
                         </div>
 
                         <div>

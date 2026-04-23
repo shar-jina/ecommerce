@@ -52,149 +52,130 @@ function Navpage() {
     }
 
     return (
-        <>
-            <nav className="bg-white shadow-md px-4 md:px-8 py-4 flex flex-col md:flex-row md:justify-between md:items-center sticky top-0 z-50">
-                <div className="flex justify-between items-center w-full md:w-auto">
-                    <Link to="/" className="text-2xl font-black text-blue-600 tracking-tighter">
-                        SHOP<span className="text-gray-900">ZY</span>
-                    </Link>
-                    
-                    <button 
-                        className="md:hidden text-gray-700 hover:text-blue-600 focus:outline-none p-2"
-                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        aria-label="Toggle menu"
-                    >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            {isMobileMenuOpen ? (
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                            ) : (
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                            )}
-                        </svg>
-                    </button>
-                </div>
+        <header className="sticky top-0 z-50">
+           
 
-                <div className={`${isMobileMenuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row gap-4 md:gap-8 items-center font-medium w-full md:w-auto mt-4 md:mt-0 pb-4 md:pb-0 transition-all duration-300`}>
-                    <Link 
-                        to="/" 
-                        className={`transition-colors w-full md:w-auto text-center ${location.pathname === '/' ? 'text-blue-600 font-black' : 'text-gray-700 hover:text-blue-600'}`}
-                    >
-                        Home
+            {/* Main Navigation - Tier 1 */}
+            <nav className="bg-white border-b border-gray-100 px-6 md:px-12 py-4 shadow-sm">
+                <div className="container mx-auto flex items-center justify-between gap-8">
+                    {/* Brand */}
+                    <Link to="/" className="text-2xl font-black tracking-tight text-teal font-heading">
+                        <span className="text-orange">shopzy</span>
                     </Link>
 
-                    {(role === "admin" || role === "manager" || role === "superadmin") && (
-                        <Link 
-                            to="/dashboard" 
-                            className={`transition-colors w-full md:w-auto text-center ${location.pathname === '/dashboard' ? 'text-blue-600 font-black' : 'text-gray-700 hover:text-blue-600'}`}
-                        >
-                            Dashboard
-                        </Link>
-                    )}
-                    
-                    <Link 
-                        to="/productdetail" 
-                        className={`transition-colors w-full md:w-auto text-center ${location.pathname === '/productdetail' ? 'text-blue-600 font-black' : 'text-gray-700 hover:text-blue-600'}`}
-                    >
-                        Shop
-                    </Link>
-
-                    <Link 
-                        to={'/wishlist'} 
-                        className={`transition-colors w-full md:w-auto flex items-center justify-center gap-2 ${location.pathname === '/wishlist' ? 'text-blue-600 font-black' : 'text-gray-400 hover:text-blue-600'}`}
-                    >
-                        <span>Wishlist</span>
-                        {wishlist.length > 0 && (
-                            <span className="bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
-                                {wishlist.length}
-                            </span>
-                        )}
-                    </Link>
-
-                    {/* Notification Bell */}
-                    <div className="relative flex justify-center w-full md:w-auto">
-                        <button 
-                            onClick={() => setShowNotifications(!showNotifications)}
-                            className="text-gray-700 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100 transition-all relative"
-                            title="Notifications"
-                        >
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                            </svg>
-                            {notifications.length > 0 && (
-                                <span className="absolute top-1 right-1 bg-red-500 text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">
-                                    {notifications.length}
-                                </span>
-                            )}
-                        </button>
-
-                        {showNotifications && (
-                            <div className="absolute left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:right-0 mt-12 md:mt-2 w-[calc(100vw-2rem)] sm:w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-[60] py-2 max-h-[400px] overflow-y-auto">
-                                <div className="px-4 py-2 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
-                                    <h3 className="font-bold text-gray-900 text-sm">Notifications</h3>
-                                    <span className="text-[10px] bg-blue-100 text-blue-700 font-bold px-2 py-0.5 rounded-full">New</span>
-                                </div>
-                                {notifications.length > 0 ? (
-                                    notifications.map((n) => (
-                                        <div key={n.id} className="px-4 py-3 hover:bg-blue-50/50 transition-colors border-b border-gray-50 last:border-0 cursor-default text-left">
-                                            <p className="font-bold text-gray-900 text-xs mb-1">{n.title}</p>
-                                            <p className="text-gray-600 text-xs leading-relaxed">{n.message}</p>
-                                            <p className="text-[9px] text-gray-400 mt-2 flex items-center gap-1">
-                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                                {new Date(n.created_at).toLocaleDateString()}
-                                            </p>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="px-4 py-8 text-center text-gray-400 text-xs italic">
-                                        No new notifications
-                                    </div>
-                                )}
-                            </div>
-                        )}
+                    {/* Search Bar - Center */}
+                    <div className="hidden lg:flex flex-1 max-w-2xl relative">
+                        <div className="flex w-full items-center bg-gray-50 rounded-full border border-gray-200 overflow-hidden focus-within:border-teal transition-all p-1">
+                            <input 
+                                type="text"
+                                placeholder="Search the collection..."
+                                className="flex-1 bg-transparent px-6 py-2.5 text-sm outline-none text-onyx placeholder:text-gray-400"
+                            />
+                            <button className="bg-teal text-white px-8 py-2.5 rounded-full text-xs font-black uppercase tracking-widest hover:bg-teal-light transition-all">
+                                Search
+                            </button>
+                        </div>
                     </div>
 
-                    <Link 
-                        to={'/myorders'} 
-                        className={`transition-colors font-bold w-full md:w-auto text-center ${location.pathname === '/myorders' ? 'text-blue-600 font-black' : 'text-gray-400 hover:text-blue-600'}`}
-                    >
-                        My Orders
-                    </Link>
+                    {/* Actions */}
+                    <div className="flex items-center gap-4 md:gap-8">
+                        {/* Notifications */}
+                        <div className="relative group">
+                            <button onClick={() => setShowNotifications(!showNotifications)} className="text-gray-400 hover:text-teal transition-colors flex flex-col items-center gap-1">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                </svg>
+                                <span className="text-[9px] font-black uppercase tracking-widest hidden md:block">Alerts</span>
+                                {notifications.length > 0 && <span className="absolute top-0 right-0 w-2 h-2 bg-orange rounded-full border-2 border-white"></span>}
+                            </button>
+                        </div>
 
-                    <Link 
-                        to="/cart" 
-                        className={`relative group transition-colors w-full md:w-auto flex items-center justify-center ${location.pathname === '/cart' ? 'text-blue-600 font-black' : 'text-gray-700 hover:text-blue-600'}`}
-                    >
-                        <span>Cart</span>
-                        {getCartCount() > 0 && (
-                            <span className="absolute -top-2 md:-top-2 right-[50%] md:-right-4 translate-x-[25px] md:translate-x-0 bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white shadow-sm animate-bounce">
-                                {getCartCount()}
-                            </span>
-                        )}
-                    </Link>
-                    
-
-                    {isLoggedIn ? (
-                        <button
-                            onClick={handleLogout}
-                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors w-full md:w-auto text-center"
-                        >
-                            Logout
-                        </button>
-                    ) : (
-                        <Link
-                            to="/login"
-                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors w-full md:w-auto text-center"
-                        >
-                            Login
+                        {/* Wishlist */}
+                        <Link to="/wishlist" className="text-gray-400 hover:text-teal transition-colors flex flex-col items-center gap-1">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                            <span className="text-[9px] font-black uppercase tracking-widest hidden md:block">Wishlist</span>
                         </Link>
-                    )}
 
+                        {/* Cart */}
+                        <Link to="/cart" className="text-gray-400 hover:text-teal transition-colors flex flex-col items-center gap-1 relative">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            </svg>
+                            <span className="text-[9px] font-black uppercase tracking-widest hidden md:block">Cart</span>
+                            {getCartCount() > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-orange text-white text-[8px] font-black w-4 h-4 flex items-center justify-center rounded-full border-2 border-white">
+                                    {getCartCount()}
+                                </span>
+                            )}
+                        </Link>
+
+                        {/* Account */}
+                        {isLoggedIn ? (
+                            <button onClick={handleLogout} className="flex flex-col items-center gap-1 text-gray-400 hover:text-teal transition-colors group">
+                                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-teal group-hover:text-white transition-all">
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                </div>
+                                <span className="text-[9px] font-black uppercase tracking-widest hidden md:block">Exit</span>
+                            </button>
+                        ) : (
+                            <Link to="/login" className="flex flex-col items-center gap-1 text-gray-400 hover:text-teal transition-colors group">
+                                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-teal group-hover:text-white transition-all text-gray-500">
+                                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                                   </svg>
+                                </div>
+                                <span className="text-[9px] font-black uppercase tracking-widest hidden md:block">Join</span>
+                            </Link>
+                        )}
+
+                        {/* Mobile Menu Toggle */}
+                        <button className="lg:hidden text-teal p-2" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-
             </nav>
-        </>
+
+            {/* Navigation - Tier 2 */}
+            <div className="bg-white border-b border-gray-100 hidden lg:block">
+                <div className="container mx-auto px-12">
+                    <div className="flex items-center gap-10 py-3">
+                        <Link to="/" className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:text-orange ${location.pathname === '/' ? 'text-orange border-b-2 border-orange pb-3 -mb-3' : 'text-teal'}`}>
+                            Home
+                        </Link>
+                        <Link to="/productdetail" className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:text-orange ${location.pathname === '/productdetail' ? 'text-orange border-b-2 border-orange pb-3 -mb-3' : 'text-teal'}`}>
+                            Catalog
+                        </Link>
+                        <Link to="/wishlist" className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:text-orange ${location.pathname === '/wishlist' ? 'text-orange border-b-2 border-orange pb-3 -mb-3' : 'text-teal'}`}>
+                            Archive
+                        </Link>
+                        {(role === "admin" || role === "manager" || role === "superadmin") && (
+                            <Link to="/dashboard" className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:text-orange ${location.pathname === '/dashboard' ? 'text-orange border-b-2 border-orange pb-3 -mb-3' : 'text-teal'}`}>
+                                Console
+                            </Link>
+                        )}
+                      
+                    </div>
+                </div>
+            </div>
+
+            {/* Mobile Menu Overlay */}
+            {isMobileMenuOpen && (
+                <div className="fixed inset-0 bg-black/90 z-40 flex flex-col items-center justify-center gap-8 md:hidden backdrop-blur-lg">
+                    <Link to="/" className="text-xl uppercase tracking-[0.3em] text-white">Home</Link>
+                    <Link to="/productdetail" className="text-xl uppercase tracking-[0.3em] text-white">Shop</Link>
+                    <Link to="/wishlist" className="text-xl uppercase tracking-[0.3em] text-white">Wishlist</Link>
+                    <Link to="/myorders" className="text-xl uppercase tracking-[0.3em] text-white">My Orders</Link>
+                    <button onClick={handleLogout} className="text-orange uppercase tracking-[0.3em] mt-4 font-black">Logout</button>
+                </div>
+            )}
+        </header>
     )
 }
 

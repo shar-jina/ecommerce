@@ -8,6 +8,7 @@ const ProductModal = ({ isOpen, onClose, product, onUpdate }) => {
         description: '',
         category: '',
         stock: '',
+        specifications: '',
     });
     const [images, setImages] = useState([]);
     const [previews, setPreviews] = useState([]);
@@ -21,6 +22,9 @@ const ProductModal = ({ isOpen, onClose, product, onUpdate }) => {
                 description: product.description || '',
                 category: product.category || '',
                 stock: product.stock || '',
+                specifications: typeof product.specifications === 'object' ? 
+                    Object.entries(product.specifications).map(([k, v]) => `${k}: ${v}`).join('\n') : 
+                    (product.specifications || ''),
             });
             if (product.images && product.images.length > 0) {
                 setPreviews(product.images);
@@ -36,6 +40,7 @@ const ProductModal = ({ isOpen, onClose, product, onUpdate }) => {
                 description: '',
                 category: '',
                 stock: '',
+                specifications: '',
             });
             setPreviews([]);
             setImages([]);
@@ -70,20 +75,34 @@ const ProductModal = ({ isOpen, onClose, product, onUpdate }) => {
         };
 
         try {
+            const processedFormData = { ...formData };
+            if (formData.specifications) {
+                const specsObj = {};
+                formData.specifications.split('\n').forEach(line => {
+                    const [key, ...val] = line.split(':');
+                    if (key && val.length > 0) specsObj[key.trim()] = val.join(':').trim();
+                });
+                processedFormData.specifications = JSON.stringify(specsObj);
+            }
+
             let result;
             if (product) {
                 // Update Product
-                const updateData = images.length > 0 ? new FormData() : { ...formData };
+                const updateData = images.length > 0 ? new FormData() : { ...processedFormData };
                 if (images.length > 0) {
-                    Object.keys(formData).forEach(key => updateData.append(key, formData[key]));
+                    Object.keys(processedFormData).forEach(key => {
+                        if (processedFormData[key] !== undefined) updateData.append(key, processedFormData[key]);
+                    });
                     images.forEach(img => updateData.append('images', img));
                 }
 
-                result = await updateProductAPI(product.id, images.length > 0 ? updateData : formData, reqHeader);
+                result = await updateProductAPI(product.id || product._id, images.length > 0 ? updateData : processedFormData, reqHeader);
             } else {
                 // Add Product
                 const addData = new FormData();
-                Object.keys(formData).forEach(key => addData.append(key, formData[key]));
+                Object.keys(processedFormData).forEach(key => {
+                    if (processedFormData[key] !== undefined) addData.append(key, processedFormData[key]);
+                });
                 images.forEach(img => addData.append('images', img));
                 result = await addProductAPI(addData, reqHeader);
             }
@@ -136,7 +155,7 @@ const ProductModal = ({ isOpen, onClose, product, onUpdate }) => {
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
                                 <input
                                     type="number"
                                     required
@@ -180,6 +199,17 @@ const ProductModal = ({ isOpen, onClose, product, onUpdate }) => {
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 placeholder="Product description..."
+                            ></textarea>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Specifications (One per line, e.g. RAM: 8GB)</label>
+                            <textarea
+                                rows="3"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
+                                value={formData.specifications}
+                                onChange={(e) => setFormData({ ...formData, specifications: e.target.value })}
+                                placeholder="Color: Midnight Blue&#10;Material: Aluminium&#10;Size: 13-inch"
                             ></textarea>
                         </div>
 

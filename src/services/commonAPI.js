@@ -12,7 +12,7 @@ const commonAPI=async(httpmethod,url,reqbody,reqheader)=>{
    return await axios(reqconfig).then(res=>{
         return res
     }).catch(err=>{
-        return err
+        return err.response || err;
     })
 }
 export default commonAPI

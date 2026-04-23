@@ -29,7 +29,8 @@ function PostManagement() {
             }
             if (productsRes.status === 200) {
                 const prodMap = productsRes.data.reduce((acc, p) => {
-                    acc[p.id] = p;
+                    // Using _id or id for safe lookup
+                    acc[p._id || p.id] = p;
                     return acc;
                 }, {});
                 setProducts(prodMap);
@@ -49,12 +50,16 @@ function PostManagement() {
             };
             try {
                 const result = await deletePostAPI(id, reqHeader);
-                if (result.status === 200) {
+                if (result.status === 200 || result.status === 204) {
                     alert("Post deleted successfully");
                     fetchData();
+                } else {
+                    const errorMsg = result.response?.data?.message || result.message || "Delete failed";
+                    alert("Error: " + errorMsg);
                 }
             } catch (error) {
                 console.error("Delete failed", error);
+                alert("Critical error during deletion");
             }
         }
     };
@@ -155,7 +160,7 @@ function PostManagement() {
                                 filteredPosts.map((post) => {
                                     const linkedProduct = products[post.product_id];
                                     return (
-                                        <tr key={post.id} className="hover:bg-gray-50/50 transition-all group">
+                                        <tr key={post._id || post.id} className="hover:bg-gray-50/50 transition-all group">
                                             <td className="px-8 py-5">
                                                 <div className="flex items-center gap-5">
                                                     <div className="relative flex-shrink-0 cursor-pointer overflow-hidden rounded-xl shadow-sm border border-gray-100"
@@ -202,6 +207,11 @@ function PostManagement() {
                                                         <span className="text-gray-900 font-bold text-sm">{linkedProduct.name}</span>
                                                         <span className="text-blue-500 font-black text-xs">${linkedProduct.price}</span>
                                                     </div>
+                                                ) : post.target_category ? (
+                                                    <div className="flex flex-col">
+                                                        <span className="text-blue-600 font-black text-sm uppercase tracking-tight">{post.target_category}</span>
+                                                        <span className="text-gray-400 font-bold text-[10px]">COLLECTION LINK</span>
+                                                    </div>
                                                 ) : (
                                                     <span className="text-gray-300 italic text-sm font-medium">—</span>
                                                 )}
@@ -221,7 +231,7 @@ function PostManagement() {
                                                         </svg>
                                                     </button>
                                                     <button
-                                                        onClick={() => handleDelete(post.id)}
+                                                        onClick={() => handleDelete(post.id || post._id)}
                                                         className="p-3 text-red-400 hover:bg-red-50 rounded-2xl transition-all active:scale-90"
                                                         title="Remove Post"
                                                     >

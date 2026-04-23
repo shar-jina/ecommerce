@@ -34,6 +34,9 @@ function UserManagement() {
         const result = await toggleBlockUserAPI(id, !currentStatus, reqHeader);
         if (result.status === 200) {
           fetchUsers();
+        } else {
+          const errorMsg = result.response?.data?.message || result.message || "Update failed";
+          alert("Error: " + errorMsg);
         }
       } catch (error) {
         console.error("Error toggling block status", error);
@@ -48,8 +51,11 @@ function UserManagement() {
         const token = sessionStorage.getItem('token');
         const reqHeader = { "Authorization": `Bearer ${token}` };
         const result = await deleteUserAPI(id, reqHeader);
-        if (result.status === 200) {
+        if (result.status === 200 || result.status === 204) {
           fetchUsers();
+        } else {
+          const errorMsg = result.response?.data?.message || result.message || "Delete failed";
+          alert("Error: " + errorMsg);
         }
       } catch (error) {
         console.error("Error deleting user", error);
@@ -113,7 +119,7 @@ function UserManagement() {
                 </tr>
               ) : filteredUsers.length > 0 ? (
                 filteredUsers.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={user.id || user._id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
                         <span className="font-bold text-gray-900">{user.name}</span>
@@ -144,13 +150,13 @@ function UserManagement() {
                         {user.role !== 'admin' && (
                           <>
                             <button
-                              onClick={() => handleToggleBlock(user.id, user.is_blocked)}
+                              onClick={() => handleToggleBlock(user.id || user._id, user.is_blocked)}
                               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${user.is_blocked ? 'bg-green-50 text-green-600 hover:bg-green-100 border border-green-200' : 'bg-orange-50 text-orange-600 hover:bg-orange-100 border border-orange-200'}`}
                             >
                               {user.is_blocked ? 'Unblock' : 'Block'}
                             </button>
                             <button
-                              onClick={() => handleDelete(user.id)}
+                              onClick={() => handleDelete(user.id || user._id)}
                               className="px-3 py-1.5 rounded-lg text-sm font-medium bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition-colors flex items-center gap-1"
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>

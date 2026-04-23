@@ -32,8 +32,11 @@ function Loginpage() {
                     sessionStorage.setItem("user",JSON.stringify(result.data.user))
                     sessionStorage.setItem("role", result.data.user.role);
 
-
-                    navigate('/')
+                    if(result.data.user.role === "admin" || result.data.user.role === "manager" || result.data.user.role === "superadmin") {
+                        navigate('/dashboard')
+                    } else {
+                        navigate('/')
+                    }
 
                     setlogdata({
                         email: "",
@@ -42,24 +45,20 @@ function Loginpage() {
 
                 }
                 else {
-
+                    const errorMsg = result.data?.message || result.data?.error || "Login Failed";
+                    alert(errorMsg);
+                    
                     if (result.status == 400) {
-
-                        alert("Invalid email or password")
-
                         setlogdata({
                             email: "",
                             password: ""
                         })
-
                     }
-
                 }
 
             } catch (error) {
-
-                alert("Login Failed")
-
+                console.error("Login logical error:", error);
+                alert("An unexpected error occurred. Please try again.");
             }
 
         }
@@ -73,52 +72,59 @@ function Loginpage() {
 
 
     return (
-        <div className="flex justify-center items-center min-h-[80vh] bg-gray-100">
-
-            <div className="bg-white p-8 rounded-lg shadow-lg w-96">
-
-                <h2 className="text-2xl font-bold mb-6 text-center">
-                    Login
-                </h2>
-
-                <input
-                    type="email"
-                    placeholder="Email"
-                    className="w-full border p-2 mb-4 rounded"
-                    value={logdata.email}
-                    onChange={(e) => setlogdata({ ...logdata, email: e.target.value })}
-                />
-
-                <input
-                    type="password"
-                    placeholder="Password"
-                    className="w-full border p-2 mb-4 rounded"
-                    value={logdata.password}
-                    onChange={(e) => setlogdata({ ...logdata, password: e.target.value })}
-                />
-
-                <button
-                    onClick={handleLogin}
-                    className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-                >
-                    Login
-                </button>
-                <div className="text-center mt-4">
-                    <p className="text-gray-600">
-                        Don't have an account?{" "}
-                        <span
-                            onClick={() => navigate("/register")}
-                            className="text-blue-600 cursor-pointer font-semibold"
-                        >
-                            Register
-                        </span>
-                    </p>
+        <div className="flex justify-center items-center min-h-screen bg-black text-white font-inter px-6">
+            <div className="w-full max-w-[400px] animate-fade-in">
+                <div className="text-center mb-12">
+                    <span className="text-gold text-[10px] font-black uppercase tracking-[0.4em] mb-4 block">Identity</span>
+                    <h2 className="text-[40px] font-black font-heading uppercase tracking-tighter leading-none mb-4">Login.</h2>
+                    <p className="text-gray-500 text-xs font-light tracking-wide">Enter your credentials to access the selection.</p>
                 </div>
 
-            </div>
+                <div className="space-y-6">
+                    <div className="space-y-2">
+                        <label className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Email Protocol</label>
+                        <input
+                            type="email"
+                            placeholder="name@architecture.com"
+                            className="w-full bg-[#0a0a0a] border border-white/5 px-6 py-4 text-xs font-light focus:border-gold outline-none transition-all placeholder:text-gray-800"
+                            value={logdata.email}
+                            onChange={(e) => setlogdata({ ...logdata, email: e.target.value })}
+                        />
+                    </div>
 
+                    <div className="space-y-2">
+                        <label className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Secure Key</label>
+                        <input
+                            type="password"
+                            placeholder="••••••••"
+                            className="w-full bg-[#0a0a0a] border border-white/5 px-6 py-4 text-xs font-light focus:border-gold outline-none transition-all placeholder:text-gray-800"
+                            value={logdata.password}
+                            onChange={(e) => setlogdata({ ...logdata, password: e.target.value })}
+                        />
+                    </div>
+
+                    <button
+                        onClick={handleLogin}
+                        className="w-full bg-white text-black py-6 rounded-sm font-black text-[10px] uppercase tracking-[0.3em] hover:bg-gold hover:text-white transition-all active:scale-[0.98] mt-4"
+                    >
+                        Access Selection
+                    </button>
+                    
+                    <div className="text-center mt-10">
+                        <p className="text-[10px] text-gray-600 uppercase tracking-widest">
+                            New to the Collective?{" "}
+                            <span
+                                onClick={() => navigate("/register")}
+                                className="text-white cursor-pointer font-black border-b border-white/10 hover:border-white transition-all pb-0.5 ml-2"
+                            >
+                                Register
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
-    )
+    );
 }
 
 export default Loginpage
