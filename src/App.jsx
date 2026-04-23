@@ -12,6 +12,7 @@ import ProductDetail from './pages/ProductDetail'
 import Wishlist from './pages/Wishlist'
 import OrderSuccess from './pages/OrderSuccess';
 import MyOrders from './pages/MyOrders';
+import ProtectedRoute from './components/ProtectedRoute';
 
 
 
@@ -27,14 +28,16 @@ function App() {
     <Routes>
       <Route  path={'/'} element={<Homepage/>} />
       <Route  path={'/login'} element={<Loginpage/>} />
-      <Route  path={'/productdetail'} element={<Prdctdetail/>} />
       <Route  path={'/register'} element={<Registerpage/>} />
-      <Route  path={'/cart'} element={<Cart/>} />
-      <Route  path={'/dashboard'} element={<Dashboard/>} />
-      <Route  path={'/product/:id'} element={<ProductDetail/>} />
-      <Route  path={'/wishlist'} element={<Wishlist/>} />
-      <Route path={'/ordersuccess'} element={<OrderSuccess />} />
-      <Route path={'/myorders'} element={<MyOrders />} />
+
+      {/* Protected Routes */}
+      <Route path={'/productdetail'} element={<ProtectedRoute><Prdctdetail/></ProtectedRoute>} />
+      <Route path={'/cart'} element={<ProtectedRoute><Cart/></ProtectedRoute>} />
+      <Route path={'/dashboard'} element={<ProtectedRoute><Dashboard/></ProtectedRoute>} />
+      <Route path={'/product/:id'} element={<ProtectedRoute><ProductDetail/></ProtectedRoute>} />
+      <Route path={'/wishlist'} element={<ProtectedRoute><Wishlist/></ProtectedRoute>} />
+      <Route path={'/ordersuccess'} element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
+      <Route path={'/myorders'} element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
 
 
 
