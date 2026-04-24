@@ -157,7 +157,7 @@ function Navpage() {
                         </Link>
                         {(role === "admin" || role === "manager" || role === "superadmin") && (
                             <Link to="/dashboard" className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:text-orange ${location.pathname === '/dashboard' ? 'text-orange border-b-2 border-orange pb-3 -mb-3' : 'text-teal'}`}>
-                                Console
+                                Admin
                             </Link>
                         )}
                       
@@ -172,7 +172,11 @@ function Navpage() {
                     <Link to="/productdetail" className="text-xl uppercase tracking-[0.3em] text-white">Shop</Link>
                     <Link to="/wishlist" className="text-xl uppercase tracking-[0.3em] text-white">Wishlist</Link>
                     <Link to="/myorders" className="text-xl uppercase tracking-[0.3em] text-white">My Orders</Link>
-                    <button onClick={handleLogout} className="text-orange uppercase tracking-[0.3em] mt-4 font-black">Logout</button>
+                    {isLoggedIn ? (
+                        <button onClick={handleLogout} className="text-orange uppercase tracking-[0.3em] mt-4 font-black">Logout</button>
+                    ) : (
+                        <Link to="/login" className="text-orange uppercase tracking-[0.3em] mt-4 font-black">Login</Link>
+                    )}
                 </div>
             )}
         </header>

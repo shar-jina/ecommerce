@@ -82,7 +82,7 @@ function Loginpage() {
 
                 <div className="space-y-6">
                     <div className="space-y-2">
-                        <label className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Email Protocol</label>
+                        <label className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Email</label>
                         <input
                             type="email"
                             placeholder="name@architecture.com"
@@ -107,7 +107,7 @@ function Loginpage() {
                         onClick={handleLogin}
                         className="w-full bg-white text-black py-6 rounded-sm font-black text-[10px] uppercase tracking-[0.3em] hover:bg-gold hover:text-white transition-all active:scale-[0.98] mt-4"
                     >
-                        Access Selection
+                        Login
                     </button>
                     
                     <div className="text-center mt-10">

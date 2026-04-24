@@ -76,7 +76,7 @@ function Registerpage() {
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Email Protocol</label>
+                                <label className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] ml-1">Email</label>
                                 <input
                                     type="email"
                                     placeholder="name@architecture.com"

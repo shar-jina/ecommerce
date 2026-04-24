@@ -91,11 +91,11 @@ const ProductCard = ({ product }) => {
             <div className="p-5 flex flex-col flex-1">
                 <div className="flex justify-between items-start gap-4 mb-3">
                     <Link to={`/product/${product.id}`} className="flex-1">
-                        <h3 className="text-sm font-bold text-onyx hover:text-teal transition-colors line-clamp-2 leading-tight">
+                        <h3 className="text-body font-bold text-onyx hover:text-teal transition-colors line-clamp-2 leading-tight">
                             {product.name}
                         </h3>
                     </Link>
-                    <span className="text-sm font-black text-teal">
+                    <span className="text-body font-black text-teal">
                         ₹{product.price}
                     </span>
                 </div>

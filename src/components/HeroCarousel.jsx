@@ -26,7 +26,7 @@ const HeroCarousel = ({ offers }) => {
     };
 
     return (
-        <div className="relative w-full h-[250px] md:h-[350px] overflow-hidden bg-gray-900 rounded-3xl shadow-xl group">
+        <div className="relative w-full h-[300px] md:h-[450px] overflow-hidden bg-transparent group">
             {/* Slides container */}
             <div 
                 className="flex transition-transform duration-700 ease-in-out h-full"
@@ -35,7 +35,7 @@ const HeroCarousel = ({ offers }) => {
                 {offers.map((offer, index) => (
                     <div 
                         key={offer.id || index} 
-                        className="min-w-full h-full relative cursor-pointer"
+                        className="min-w-full h-full p-4 md:p-6"
                         onClick={() => {
                             if (offer.product_id) {
                                 navigate(`/product/${offer.product_id}`);
@@ -44,31 +44,33 @@ const HeroCarousel = ({ offers }) => {
                             }
                         }}
                     >
-                        <div className="flex h-full items-center px-12">
-                            {/* Full Background Image */}
-                            <div className="absolute inset-0 z-0">
-                                <img 
-                                    src={offer.image} 
-                                    alt={offer.title} 
-                                    className="w-full h-full object-cover opacity-70 transition-transform duration-700 hover:scale-105"
-                                />
-                                {/* Dark Gradient Overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-900/40 to-transparent"></div>
+                        <div className="relative w-full h-full rounded-3xl overflow-hidden bg-white shadow-lg group-hover:shadow-2xl transition-all duration-500">
+                            {/* Curved & Padded Image Container */}
+                            <div className="absolute inset-0 z-0 p-4 md:p-8">
+                                <div className="w-full h-full rounded-2xl overflow-hidden relative">
+                                    <img 
+                                        src={offer.image} 
+                                        alt={offer.title} 
+                                        className="w-full h-full object-cover opacity-80 transition-transform duration-[3s] group-hover:scale-110"
+                                    />
+                                    {/* Subtle Gradient Overlay for Text Readability */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-teal/80 via-teal/30 to-transparent"></div>
+                                </div>
                             </div>
 
                             {/* Text Overlay Content */}
-                            <div className="relative z-10 max-w-2xl text-white">
-                                <span className="inline-block px-3 py-1 mb-4 text-xs font-black tracking-[0.2em] uppercase bg-blue-600 rounded-lg shadow-lg">
+                            <div className="relative z-10 h-full flex flex-col justify-center px-12 md:px-20 text-white">
+                                <span className="inline-block px-3 py-1 mb-4 text-[10px] font-black tracking-[0.2em] uppercase bg-orange rounded-lg shadow-lg self-start">
                                     {offer.discount_label || 'Exclusive Deal'}
                                 </span>
-                                <h2 className="text-3xl md:text-5xl font-black mb-4 leading-tight drop-shadow-lg">
+                                <h2 className="text-display mb-4 leading-tight drop-shadow-xl uppercase max-w-lg">
                                     {offer.title}
                                 </h2>
-                                <p className="hidden md:block text-lg text-gray-200 mb-8 max-w-xl leading-relaxed line-clamp-2">
-                                    {offer.content}
+                                <p className="hidden md:block text-body text-white/70 mb-8 max-w-md leading-relaxed line-clamp-2">
+                                    {offer.content || offer.description}
                                 </p>
-                                <div className="inline-block bg-white text-gray-900 px-6 py-3 rounded-xl font-black text-sm hover:bg-blue-50 transition-all shadow-xl active:scale-95">
-                                    Shop Offer
+                                <div className="inline-block bg-white text-teal px-8 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange hover:text-white transition-all shadow-xl active:scale-95 self-start">
+                                    Discover Now
                                 </div>
                             </div>
                         </div>
