@@ -167,55 +167,26 @@ function Navpage() {
 
             {/* Mobile Menu Overlay */}
             {isMobileMenuOpen && (
-                <div className="fixed inset-0 bg-white z-[100] flex flex-col md:hidden animate-fade-in">
-                    <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
-                        <span className="text-xl font-black text-teal uppercase tracking-widest">Navigation</span>
-                        <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-teal">
-                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
+                <div className="fixed inset-0 bg-black/95 z-[100] flex flex-col items-center justify-center gap-10 md:hidden backdrop-blur-xl animate-fade-in">
+                    <button onClick={() => setIsMobileMenuOpen(false)} className="absolute top-8 right-8 text-white/50 hover:text-white transition-colors">
+                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
 
-                    <div className="flex-1 overflow-y-auto p-8 space-y-10">
-                        <div className="space-y-6">
-                            <Link to="/" className="flex items-center gap-4 text-2xl font-black uppercase tracking-widest text-teal hover:text-orange transition-all">
-                                <span>Home</span>
-                            </Link>
-                            <Link to="/productdetail" className="flex items-center gap-4 text-2xl font-black uppercase tracking-widest text-teal hover:text-orange transition-all">
-                                <span>Shop</span>
-                            </Link>
-                            <Link to="/wishlist" className="flex items-center gap-4 text-2xl font-black uppercase tracking-widest text-teal hover:text-orange transition-all">
-                                <span>Wishlist</span>
-                                {wishlist.length > 0 && <span className="bg-orange text-white text-xs px-2 py-0.5 rounded-full">{wishlist.length}</span>}
-                            </Link>
-                            <Link to="/cart" className="flex items-center gap-4 text-2xl font-black uppercase tracking-widest text-teal hover:text-orange transition-all">
-                                <span>My Cart</span>
-                                {getCartCount() > 0 && <span className="bg-orange text-white text-xs px-2 py-0.5 rounded-full">{getCartCount()}</span>}
-                            </Link>
-                            <Link to="/myorders" className="flex items-center gap-4 text-2xl font-black uppercase tracking-widest text-teal hover:text-orange transition-all">
-                                <span>Orders</span>
-                            </Link>
-                        </div>
-
-                        <div className="pt-10 border-t border-gray-100">
-                            {isLoggedIn ? (
-                                <button onClick={handleLogout} className="flex items-center gap-4 text-xl font-black uppercase tracking-widest text-orange">
-                                    <span>Logout System</span>
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                                    </svg>
-                                </button>
-                            ) : (
-                                <Link to="/login" className="flex items-center gap-4 text-xl font-black uppercase tracking-widest text-orange">
-                                    <span>Enter System</span>
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                                    </svg>
-                                </Link>
-                            )}
-                        </div>
-                    </div>
+                    <Link to="/" className="text-xl font-bold uppercase tracking-[0.4em] text-white hover:text-orange transition-all">Home</Link>
+                    <Link to="/productdetail" className="text-xl font-bold uppercase tracking-[0.4em] text-white hover:text-orange transition-all">Shop</Link>
+                    <Link to="/cart" className="text-xl font-bold uppercase tracking-[0.4em] text-white hover:text-orange transition-all flex items-center gap-4">
+                        Cart {getCartCount() > 0 && <span className="bg-orange text-white text-[10px] px-2 py-0.5 rounded-full">{getCartCount()}</span>}
+                    </Link>
+                    <Link to="/wishlist" className="text-xl font-bold uppercase tracking-[0.4em] text-white hover:text-orange transition-all">Wishlist</Link>
+                    <Link to="/myorders" className="text-xl font-bold uppercase tracking-[0.4em] text-white hover:text-orange transition-all">Orders</Link>
+                    
+                    {isLoggedIn ? (
+                        <button onClick={handleLogout} className="text-orange font-black uppercase tracking-[0.4em] mt-8 py-2 border-b-2 border-orange/20 hover:border-orange transition-all">Logout System</button>
+                    ) : (
+                        <Link to="/login" className="text-orange font-black uppercase tracking-[0.4em] mt-8 py-2 border-b-2 border-orange/20 hover:border-orange transition-all">Enter System</Link>
+                    )}
                 </div>
             )}
         </header>
